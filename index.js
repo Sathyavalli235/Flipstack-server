@@ -19,7 +19,7 @@ mongoose.connect("mongodb+srv://admin:admin@cluster0.4ana0.mongodb.net/FlipStack
 .then(() => console.log('✅ Connected to MongoDB...'))
 .catch(err => console.error('❌ Could not connect to MongoDB...', err));
 
-const User = require('./models/user');
+const User = require('./models/User');
 
 // ✅ Signup Route (includes phone, address)
 app.post('/signup', async (req, res) => {
