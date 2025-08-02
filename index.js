@@ -6,14 +6,13 @@ const app = express();
 const nodemailer = require('nodemailer');
 require("dotenv").config();
 
-
 app.use(cors({
   origin: 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 app.use(express.json());
 
-mongoose.connect(process.env.MONGODB_LINK, {
+mongoose.connect("mongodb+srv://admin:admin@cluster0.4ana0.mongodb.net/FlipStack", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
