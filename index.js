@@ -29,7 +29,11 @@ app.use((req, res, next) => {
 });
 app.use(express.json());
 
+
 mongoose.connect("mongodb+srv://admin:admin@cluster0.4ana0.mongodb.net/FlipStack", {
+
+// mongoose.connect(process.env.MONGODB_LINK, {
+// >>>>>>> c88f259 (update message)
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
