@@ -5,12 +5,37 @@ const cors = require('cors');
 const app = express();
 const nodemailer = require('nodemailer');
 require("dotenv").config();
+
 const allowOrigins = ["http://localhost:3000", "https://sathyavalli235.github.io"]
 
+//const allowOrigins = ["http://localhost:3000", "https://sathyavalli235.github.io"]
 // app.use(cors({
 //   origin: 'http://localhost:3000',
 //   methods: ['GET', 'POST', 'PUT', 'DELETE']
 // }));
+
+// app.use((req, res, next) => {
+//   const origin = req.headers.origin;
+//   if (allowOrigins.includes(origin)) {
+//     res.setHeader("Access-Control-Allow-Origin", origin);
+//   }
+//   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   res.setHeader("Access-Control-Allow-Credentials", "true");
+
+//   if (req.method === "OPTIONS") {
+//     return res.sendStatus(200);
+//   }
+
+//   next();
+// });
+// app.use(express.json());
+
+
+//mongoose.connect("mongodb+srv://admin:admin@cluster0.4ana0.mongodb.net/FlipStack", {
+
+// mongoose.connect(process.env.MONGODB_LINK, {
+// >>>>>>> c88f259 (update message)
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
@@ -27,13 +52,10 @@ app.use((req, res, next) => {
 
   next();
 });
+
 app.use(express.json());
 
-
 mongoose.connect("mongodb+srv://admin:admin@cluster0.4ana0.mongodb.net/FlipStack", {
-
-// mongoose.connect(process.env.MONGODB_LINK, {
-// >>>>>>> c88f259 (update message)
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -134,6 +156,33 @@ const transporter = nodemailer.createTransport({
     res.status(500).json({ success: false, message: "Failed to send message." });
   }
 });
+
+
+const Cart = require("./models/Cart");
+
+// POST /api/cart/add
+app.post("/api/cart/add", async (req, res) => {
+  const { userId, product } = req.body;
+
+  if (!userId || !product) {
+    return res.status(400).json({ message: "User ID and product required." });
+  }
+
+  try {
+    const cartItem = new Cart({ userId, product });
+    await cartItem.save();
+    res.status(201).json({ message: "Product added to cart." });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding to cart", error });
+  }
+});
+
+app.get("/api/cart/get" , async (req, res) => {
+  const cardItem = await Cart.find();
+  res.json(cardItem);
+})
+
+
 
 
 const PORT = 5000;
