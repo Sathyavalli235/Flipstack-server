@@ -8,34 +8,6 @@ require("dotenv").config();
 
 const allowOrigins = ["http://localhost:3000", "https://sathyavalli235.github.io"]
 
-//const allowOrigins = ["http://localhost:3000", "https://sathyavalli235.github.io"]
-// app.use(cors({
-//   origin: 'http://localhost:3000',
-//   methods: ['GET', 'POST', 'PUT', 'DELETE']
-// }));
-
-// app.use((req, res, next) => {
-//   const origin = req.headers.origin;
-//   if (allowOrigins.includes(origin)) {
-//     res.setHeader("Access-Control-Allow-Origin", origin);
-//   }
-//   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//   res.setHeader("Access-Control-Allow-Credentials", "true");
-
-//   if (req.method === "OPTIONS") {
-//     return res.sendStatus(200);
-//   }
-
-//   next();
-// });
-// app.use(express.json());
-
-
-//mongoose.connect("mongodb+srv://admin:admin@cluster0.4ana0.mongodb.net/FlipStack", {
-
-// mongoose.connect(process.env.MONGODB_LINK, {
-// >>>>>>> c88f259 (update message)
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
@@ -160,27 +132,60 @@ const transporter = nodemailer.createTransport({
 
 const Cart = require("./models/Cart");
 
-// POST /api/cart/add
+// ➕ Add to Cart
 app.post("/api/cart/add", async (req, res) => {
   const { userId, product } = req.body;
 
-  if (!userId || !product) {
-    return res.status(400).json({ message: "User ID and product required." });
-  }
-
   try {
+    const existing = await Cart.findOne({ userId, "product.id": product.id });
+
+    if (existing) {
+      existing.product.quantity += 1;
+      await existing.save();
+      return res.json({ message: "Quantity updated" });
+    }
+
     const cartItem = new Cart({ userId, product });
     await cartItem.save();
-    res.status(201).json({ message: "Product added to cart." });
-  } catch (error) {
-    res.status(500).json({ message: "Error adding to cart", error });
+    res.status(201).json(cartItem);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
-app.get("/api/cart/get" , async (req, res) => {
-  const cardItem = await Cart.find();
-  res.json(cardItem);
-})
+// 🧾 Get All Cart Items for a User
+app.get("/api/cart/get/:userId", async (req, res) => {
+  try {
+    const cartItems = await Cart.find({ userId: req.params.userId });
+    res.json(cartItems);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 🔁 Update Quantity
+app.put("/api/cart/update/:id", async (req, res) => {
+  try {
+    const updated = await Cart.findByIdAndUpdate(
+      req.params.id,
+      { $set: { "product.quantity": req.body.quantity } },
+      { new: true }
+    );
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ❌ Delete Cart Item
+app.delete("/api/cart/delete/:id", async (req, res) => {
+  try {
+    await Cart.findByIdAndDelete(req.params.id);
+    res.json({ message: "Item removed" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 
