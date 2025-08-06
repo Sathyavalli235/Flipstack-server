@@ -187,7 +187,11 @@ app.delete("/api/cart/delete/:id", async (req, res) => {
   }
 });
 
+// server help
 
+app.get('/api/server', async(req,res)=>{
+  res.json({message: 'Server is running...'});
+})
 
 
 const PORT = 5000;
