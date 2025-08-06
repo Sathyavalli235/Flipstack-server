@@ -190,6 +190,7 @@ app.delete("/api/cart/delete/:id", async (req, res) => {
 // server help
 
 app.get('/api/server', async(req,res)=>{
+   console.log('✅ Health check called - server is healthy');
   res.json({message: 'Server is running...'});
 })
 
